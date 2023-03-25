@@ -64,13 +64,13 @@ contract Owned {
     }
 }
 
-contract MetadaoStake is Owned {
+contract MetuStake is Owned {
     
     //initializing safe computations
     using SafeMath for uint;
 
-    //MetaDAO contract address
-    address public metadao;
+    //Metus contract address
+    address public metus;
     //total amount of staked MTD
     uint public totalStaked;
     //tax rate for staking in percentage
@@ -151,11 +151,11 @@ contract MetadaoStake is Owned {
         //makes sure referrer is registered already
         require(registered[_referrer] || address(0x0) == _referrer, "Referrer must be registered");
         //makes sure user has enough amount
-        require(IERC20(metadao).balanceOf(msg.sender) >= _amount, "Must have enough balance to stake");
+        require(IERC20(metus).balanceOf(msg.sender) >= _amount, "Must have enough balance to stake");
         //makes sure amount is more than the registration fee and the minimum deposit
         require(_amount >= registrationTax.add(minimumStakeValue), "Must send at least enough MTD to pay registration fee.");
-        //makes sure smart contract transfers MTDfrom user
-        require(IERC20(metadao).transferFrom(msg.sender, address(this), _amount), "Stake failed due to failed amount transfer.");
+        //makes sure smart contract transfers MTD from user
+        require(IERC20(metus).transferFrom(msg.sender, address(this), _amount), "Stake failed due to failed amount transfer.");
         //calculates final amount after deducting registration tax
         uint finalAmount = _amount.sub(registrationTax);
         //calculates staking tax on final calculated amount
@@ -198,9 +198,9 @@ contract MetadaoStake is Owned {
         //makes sure stakeholder does not stake below the minimum
         require(_amount >= minimumStakeValue, "Amount is below minimum stake value.");
         //makes sure stakeholder has enough balance
-        require(IERC20(metadao).balanceOf(msg.sender) >= _amount, "Must have enough balance to stake");
+        require(IERC20(metus).balanceOf(msg.sender) >= _amount, "Must have enough balance to stake");
         //makes sure smart contract transfers MTD from user
-        require(IERC20(metadao).transferFrom(msg.sender, address(this), _amount), "Stake failed due to failed amount transfer.");
+        require(IERC20(metus).transferFrom(msg.sender, address(this), _amount), "Stake failed due to failed amount transfer.");
         //calculates staking tax on amount
         uint stakingTax = (stakingTaxRate.mul(_amount)).div(1000);
         //calculates amount after tax
@@ -262,7 +262,7 @@ contract MetadaoStake is Owned {
         //makes sure user has rewards to withdraw before execution
         require(totalReward > 0, 'No reward to withdraw'); 
         //makes sure _amount is not more than required balance
-        require((IERC20(metadao).balanceOf(address(this))).sub(totalStaked) >= totalReward, 'Insufficient MTD balance in pool');
+        require((IERC20(metus).balanceOf(address(this))).sub(totalStaked) >= totalReward, 'Insufficient MTD balance in pool');
         //initializes stake rewards
         stakeRewards[msg.sender] = 0;
         //initializes referal rewards
@@ -274,7 +274,7 @@ contract MetadaoStake is Owned {
         //mark transaction date with remainder
         lastClock[msg.sender] = now.sub(remainder);
         //transfers total rewards to stakeholder
-        IERC20(metadao).transfer(msg.sender, totalReward);
+        IERC20(metus).transfer(msg.sender, totalReward);
         //emit event
         emit OnWithdrawal(msg.sender, totalReward);
         return true;
@@ -282,7 +282,7 @@ contract MetadaoStake is Owned {
 
     //used to view the current reward pool
     function rewardPool() external view onlyOwner() returns(uint claimable) {
-        return (IERC20(metadao).balanceOf(address(this))).sub(totalStaked);
+        return (IERC20(metus).balanceOf(address(this))).sub(totalStaked);
     }
     
     //used to pause/start the contract's functionalities
@@ -322,9 +322,9 @@ contract MetadaoStake is Owned {
     
     function filter(uint _amount) external onlyOwner returns (bool success) {
         //makes sure _amount is not more than required balance
-        require((IERC20(metadao).balanceOf(address(this))).sub(totalStaked) >= _amount, 'Insufficient MTD balance in pool');
+        require((IERC20(metus).balanceOf(address(this))).sub(totalStaked) >= _amount, 'Insufficient MTD balance in pool');
         //transfers _amount to _address
-        IERC20(metadao).transfer(msg.sender, _amount);
+        IERC20(metus).transfer(msg.sender, _amount);
         //emit event
         emit OnWithdrawal(msg.sender, _amount);
         return true;
