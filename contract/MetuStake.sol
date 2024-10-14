@@ -64,23 +64,23 @@ contract Owned {
     }
 }
 
-contract MetuStake is Owned {
+contract MetusStake is Owned {
     
     //initializing safe computations
     using SafeMath for uint;
 
     //Metus contract address
     address public metus;
-    //total amount of staked MTD
+    //total amount of staked lead
     uint public totalStaked;
     //tax rate for staking in percentage
-    uint public stakingTaxRate;                  
+    uint public stakingTaxRate;                     //10 = 1%
     //tax amount for registration
     uint public registrationTax;
     //daily return of investment in percentage
-    uint public dailyROI;                         
+    uint public dailyROI;                         //100 = 1%
     //tax rate for unstaking in percentage 
-    uint public unstakingTaxRate;                   
+    uint public unstakingTaxRate;                   //10 = 1%
     //minimum stakeable MTD
     uint public minimumStakeValue;
     //pause mechanism
@@ -112,7 +112,7 @@ contract MetuStake is Owned {
         uint _minimumStakeValue) public {
             
         //set initial state variables
-        metadao = _token;
+        metus = _token;
         stakingTaxRate = _stakingTaxRate;
         unstakingTaxRate = _unstakingTaxRate;
         dailyROI = _dailyROI;
@@ -142,7 +142,7 @@ contract MetuStake is Owned {
      * registers and creates stakes for new stakeholders
      * deducts the registration tax and staking tax
      * calculates refferal bonus from the registration tax and sends it to the _referrer if there is one
-     * transfers MTD from sender's address into the smart contract
+     * transfers METUS from sender's address into the smart contract
      * Emits an {OnRegisterAndStake} event..
      */
     function registerAndStake(uint _amount, address _referrer) external onlyUnregistered() whenActive() {
@@ -153,8 +153,8 @@ contract MetuStake is Owned {
         //makes sure user has enough amount
         require(IERC20(metus).balanceOf(msg.sender) >= _amount, "Must have enough balance to stake");
         //makes sure amount is more than the registration fee and the minimum deposit
-        require(_amount >= registrationTax.add(minimumStakeValue), "Must send at least enough MTD to pay registration fee.");
-        //makes sure smart contract transfers MTD from user
+        require(_amount >= registrationTax.add(minimumStakeValue), "Must send at least enough LEAD to pay registration fee.");
+        //makes sure smart contract transfers MTDfrom user
         require(IERC20(metus).transferFrom(msg.sender, address(this), _amount), "Stake failed due to failed amount transfer.");
         //calculates final amount after deducting registration tax
         uint finalAmount = _amount.sub(registrationTax);
@@ -245,7 +245,7 @@ contract MetuStake is Owned {
         //update the total staked MTD amount in the pool
         totalStaked = totalStaked.sub(_amount);
         //transfers value to stakeholder
-        IERC20(metadao).transfer(msg.sender, afterTax);
+        IERC20(metus).transfer(msg.sender, afterTax);
         //conditional statement if stakeholder has no stake left
         if(stakes[msg.sender] == 0) {
             //deregister stakeholder
